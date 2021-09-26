@@ -8,54 +8,48 @@ function PostForm() {
     doencas: '',
     historico: '',
   })
-  const [queixas, setQueixas] = useState();
-  
-  useEffect(() => {
-    Axios.get('https://assina-prontuario.herokuapp.com/queixas')
-      .then((response) => setQueixas(response.data.data))
+  const [queixas, setQueixas] = useState([]);
+  const [doencas, setDoencas] = useState([]);
+
+   useEffect(() => {
+    Axios.get('https://assina-prontuario.herokuapp.com/doencas')
+      .then((response) => setDoencas(response.data.data))
       .catch((err) => {
         console.error("ops! ocorreu um erro" + err);
       });
   }, []);
 
+  useEffect(() => {
+    Axios.get('https://assina-prontuario.herokuapp.com/queixas')//request(getTest)
+      .then((response) => setQueixas(response.data.data))
+
+      .catch((err) => {
+        console.error("ops! ocorreu um erro" + err);
+      });
+  }, []);
 
   function handle(e) {
     const newData = { ...data }
     newData[e.target.id] = e.target.value
     setData(newData)
+    // console.log(newData)
+  }
+
+  if (!queixas) {
+    return (<div>LOADING...</div>)
   }
 
   return (
     <div>
         <form >   
-        <input
-          onChange={(e) => handle(e)}
-          id="queixa"
-          value={data.queixa}
-          placeholder="queixa"
-          type="number"
-        ></input>
-        <input
-          type="number"
-          onChange={(e) => handle(e)}
-          id="doencas"
-          value={data.doencas}
-          placeholder="doencas"
-        ></input>
-      {/* <select    onChange={(e) => handle(e)} */}
-        <select >
-          {queixas.map((opt) => (
-            <option value={opt.value}>{opt.queixas}</option>
-          ))}
-        </select>
-        <textarea
-          type="text"
-          onChange={(e) => handle(e)}
-          id="historico"
-          value={data.historico}
-          placeholder="historico"
-        ></textarea>
-        <button>submit</button>
+          <select onChange={(e) => handle(e)}
+            id="queixa" value={data.queixa}>
+              <option value>Selecione</option>
+            {queixas.map((opt) => (
+              <option value={opt.label}>{opt.label}</option>
+            ))}
+          </select>
+          <button>submit</button>
       </form>
     </div>
   )
