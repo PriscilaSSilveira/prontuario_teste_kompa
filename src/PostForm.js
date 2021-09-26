@@ -3,110 +3,121 @@ import Axios from 'axios'
 // import api from "./services/api"
 
 function PostForm() {
-  const [data, setData] = useState({
+  const [form, setForm] = useState({
     queixa: '',
     doencas: '',
-    historico: '',
+    historico: ''
   })
+  
   const [selected, setSelected] = useState([])
   const [queixas, setQueixas] = useState([])
-  const [doencas, setDoencas] = useState([])
-  const [array, setArray] = useState([])
-
-
-  useEffect(() => {
-    setArray([...testMap])
-  }, [queixas])
+  const [doenca, setDoenca] = useState([])
 
   useEffect(() => {
     Axios.get('https://assina-prontuario.herokuapp.com/doencas')
-      .then((response) => setDoencas(response.data.data))
+      .then((response) => setDoenca(response.data.data))
       .catch((err) => {
         console.error('ops! ocorreu um erro' + err)
       })
   }, [])
 
   useEffect(() => {
-    Axios.get('https://assina-prontuario.herokuapp.com/queixas')
+    Axios.get('https://assina-prontuario.herokuapp.com/queixas') //request(getTest)
       .then((response) => setQueixas(response.data.data))
-
-
       .catch((err) => {
         console.error('ops! ocorreu um erro' + err)
       })
   }, [])
 
-  const testMap = queixas
-  console.log(testMap)
+  function submit(event) {
+    event.preventDefault();
+
+    const queixaData = JSON.parse(form.queixa);
+
+    const data = {
+      queixa: queixaData.id,
+      doencas: selected.map(doenca => doenca.id),
+      historico: form.historico
+    };
+
+    Axios.post('https://assina-prontuario.herokuapp.com/prontuario', data)
+      .catch((err) => {
+        console.error('ops! ocorreu um erro' + err)
+      })
+  }
 
   function handleQueixas(e) {
-    const newData = { ...data }
+    const newData = { ...form }
     newData[e.target.id] = e.target.value
-    setData(newData)
-    setSelected([...selected, JSON.parse(newData.queixa)])
+    setForm(newData)
+  }
+
+  function handleDoencas(e) {
+    const banana = { ...form }
+    banana[e.target.id] = e.target.value
+    setForm(banana)
+    setSelected([...selected, JSON.parse(banana.doencas)])
     // console.log(newData)
   }
-  function handleDoencas(e) {
-    const newData = { ...data }
-    newData[e.target.id] = e.target.value
-    setData(newData)
-    setSelected([...selected, JSON.parse(newData.doenca)])
-    // console.log(newData)
+
+  function handleHistorico(e) {
+    const newForm = { ...form }
+    newForm[e.target.id] = e.target.value
+    setForm(newForm)
+    console.log(newForm)
   }
 
   if (!queixas) {
     return <div>LOADING...</div>
   }
 
-
   return (
     <div>
-      {/* <form onSubmit={(e) => submit(e)}> */}
       <form>
+
         <select
           required
           onChange={(e) => handleQueixas(e)}
-          id="queixa"
-          value={data.queixas}
+          id="queixa" 
         >
-          <option value>Selecione</option>
+          <option>Selecione</option>
           {queixas.map((opt) => (
-            <option value={opt}>{opt.label}</option>
+            <option value={JSON.stringify(opt)}>{opt.label}</option>
           ))}
         </select>
 
         <select
           required
           onChange={(e) => handleDoencas(e)}
-          id="doenca"
-          value={data.doenca}
+          id="doencas"
+          value={form.doencas}
         >
           <option required value>
             Selecione
           </option>
-          {doencas.map((opt) => (
-            <option value={JSON.stringify(opt)}>{opt.label}</option>
+          {doenca.map((opt) => (
+            <option id="doencas" value={JSON.stringify(opt)}>{opt.label}</option>
           ))}
         </select>
 
         <textarea
           type="text"
           readOnly={true}
-          id="historico"
           value={selected.map((item) => item.label).join(', ')}
           placeholder="historico"
         ></textarea>
+
         <div>
           <p> Historico da molestia</p>
           <textarea
-            name="mensagem"
-            rows="7"
+            id="historico"
             minlength="10"
             maxlength="1000"
+            onChange={handleHistorico}
           ></textarea>
         </div>
 
-        <button>submit</button>
+        <button onClick={(e) => submit(e)}>submit</button>
       </form>
     </div>
   )
