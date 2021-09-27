@@ -1,28 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import Api from '../service/api'
-import { Link, NavLink } from 'react-router-dom'
-import Button from '../Components/Button'
+import { Link } from 'react-router-dom'
 import H1 from '../Components/H1'
 import P from '../Components/P'
-import Textarea from '../Components/Textarea'
+import { FormContext } from '../hooks/FormContext'
 import Selecionados from '../Components/Selecionados'
-import { Formik, Form, Field } from 'formik'
 import '../App.css'
-import * as Yup from "yup";
 
 function Register() {
-  const [form, setForm] = useState({
-    queixa: '',
-    doencas: '',
-    historico: '',
-  })
-
-  const schema = Yup.object().shape({
-    historico: Yup.string()
-    .required()
-    .min(10, 'Must be exactly 5 digits')
-    .max(1000, 'Must be exactly 5 digits')
-  });
+  const { form, setForm } = useContext(FormContext)
   const [selected, setSelected] = useState([])
   const [queixas, setQueixas] = useState([])
   const [doenca, setDoenca] = useState([])
@@ -70,16 +56,15 @@ function Register() {
     dataDoencas[e.target.id] = e.target.value
     setForm(dataDoencas)
     setSelected([...selected, JSON.parse(dataDoencas.doencas)])
-    // console.log(newData)
+    // console.log(dataDoencas)
   }
 
   function handleHistorico(e) {
     const newForm = { ...form }
     newForm[e.target.id] = e.target.value
     setForm(newForm)
-    console.log(newForm)
   }
-
+  window.localStorage.setItem('form', doenca)
   if (!queixas) {
     return <div>LOADING...</div>
   }
@@ -90,88 +75,76 @@ function Register() {
         <img src="https://kompa.com.br/_next/image?url=%2Fimages%2Flogo.png&w=256&q=75" />
       </div>
       <div className="container2">
-        <Formik
-        validationSchema={schema}>
-          {({errors}) => (
-            <Form>
-              <form>
-                <H1 className="anamnese" title="Anamnese" />
-                <P className="title" title="Queixa Principal" />
-                <select
-                  className="dropDown"
-                  required="required"
-                  onChange={(e) => handleQueixas(e)}
-                  id="queixa"
-                >
-                  <option selected disabled value="">
-                    Selecione...
-                  </option>
-                  {queixas.map((opt) => (
-                    <option className="option" value={JSON.stringify(opt)}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+        <form value="form">
+          <H1 className="anamnese" title="Anamnese" />
+          <P className="title" title="Queixa Principal" />
+          <select
+            className="dropDown"
+            required="required"
+            onChange={(e) => handleQueixas(e)}
+            id="queixa"
+          >
+            <option selected disabled value="">
+              Selecione...
+            </option>
+            {queixas.map((opt) => (
+              <option className="option" value={JSON.stringify(opt)}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
 
-                <P className="title" title="Doenças Adulto" />
-                <select
-                  className="dropDown"
-                  required="required"
-                  onChange={(e) => handleDoencas(e)}
-                  id="doencas"
-                  value={form.doencas}
-                >
-                  <option selected disabled value="">
-                    Selecione...
-                  </option>
-                  {doenca.map((opt) => (
-                    <option
-                      className="option"
-                      id="doencas"
-                      value={JSON.stringify(opt)}
-                    >
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+          <P className="title" title="Doenças Adulto" />
+          <select
+            className="dropDown"
+            required="required"
+            onChange={(e) => handleDoencas(e)}
+            id="doencas"
+            value={form.doencas}
+          >
+            <option selected disabled value="">
+              Selecione...
+            </option>
+            {doenca.map((opt) => (
+              <option
+                className="option"
+                id="doencas"
+                value={JSON.stringify(opt)}
+              >
+                {opt.label}
+              </option>
+            ))}
+          </select>
 
-                <P className="title1" title="Selecionados:" />
-                <Selecionados
-                  value={selected.map((item) => item.label).join(', ')}
-                />
-                <textarea
-                  className="historico"
-                  type="text"
-                  readOnly={true}
-                  value={selected.map((item) => item.label).join(', ')}
-                ></textarea>
+          <P className="title1" title="Selecionados:" />
+          <Selecionados value={selected.map((item) => item.label).join(', ')} />
+          <textarea
+            className="historico"
+            type="text"
+            readOnly={true}
+            value={selected.map((item) => item.label).join(', ')}
+          ></textarea>
 
-                <P title="Histórico da moléstia" />
-<div>
-  <label htmlFor="histprico"></label>
-                <Field
-                name="historico"
-                  className="historico"
-                  id="historico"
-                  type="text"
-                  required="required"
-                  minlength="10"
-                  maxlength="1000"
-                  onChange={handleHistorico}
-                />
-                {errors.historico && (
-                  <div>{errors.historico}campo requerido</div>
-                )}
-</div>
-                <Link to="/">
-                  <Button title="Salvar" handleClick={(e) => submit(e)} />
-                </Link>
+          <P className="title" title="Histórico da moléstia" />
 
-                {/* <button onClick={(e) => submit(e)}>submit</button> */}
-              </form>
-            </Form>
-          )}
-        </Formik>
+          <textarea
+            className="historico"
+            id="historico"
+            type="text"
+            required
+            minLength={10}
+            maxLength={1000}
+            onChange={handleHistorico}
+            placeholder="Observações"
+          />
+          <Link to="/">
+            {
+              <button title="Salvar" handleClick={(e) => submit(e)}>
+                Proximo
+              </button>
+            }
+          </Link>
+        </form>
       </div>
     </div>
   )
