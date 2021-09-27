@@ -1,126 +1,121 @@
-import React, { useState, useEffect } from 'react'
-import Axios from 'axios'
-// import api from "./services/api"
+// import React, { useState, useEffect } from 'react'
+// import Api from './service/api'
 
-function PostForm() {
-  const [form, setForm] = useState({
-    queixa: '',
-    doencas: '',
-    historico: ''
-  })
-  
-  const [selected, setSelected] = useState([])
-  const [queixas, setQueixas] = useState([])
-  const [doenca, setDoenca] = useState([])
+// function PostForm() {
+//   const [form, setForm] = useState({
+//     queixa: '',
+//     doencas: '',
+//     historico: '',
+//   })
 
-  useEffect(() => {
-    Axios.get('https://assina-prontuario.herokuapp.com/doencas')
-      .then((response) => setDoenca(response.data.data))
-      .catch((err) => {
-        console.error('ops! ocorreu um erro' + err)
-      })
-  }, [])
+//   const [selected, setSelected] = useState([])
+//   const [queixas, setQueixas] = useState([])
+//   const [doenca, setDoenca] = useState([])
 
-  useEffect(() => {
-    Axios.get('https://assina-prontuario.herokuapp.com/queixas') //request(getTest)
-      .then((response) => setQueixas(response.data.data))
-      .catch((err) => {
-        console.error('ops! ocorreu um erro' + err)
-      })
-  }, [])
+//   useEffect(() => {
+//     Api.get('/doencas')
+//       .then((response) => setDoenca(response.data.data))
+//       .catch((err) => {
+//         console.error('ops! ocorreu um erro' + err)
+//       })
+//   }, [])
 
-  function submit(event) {
-    event.preventDefault();
+//   useEffect(() => {
+//     Api.get('/queixas') //request(getTest)
+//       .then((response) => setQueixas(response.data.data))
+//       .catch((err) => {
+//         console.error('ops! ocorreu um erro' + err)
+//       })
+//   }, [])
 
-    const queixaData = JSON.parse(form.queixa);
+//   function submit(event) {
+//     event.preventDefault()
 
-    const data = {
-      queixa: queixaData.id,
-      doencas: selected.map(doenca => doenca.id),
-      historico: form.historico
-    };
+//     const queixaData = JSON.parse(form.queixa)
 
-    Axios.post('https://assina-prontuario.herokuapp.com/prontuario', data)
-      .catch((err) => {
-        console.error('ops! ocorreu um erro' + err)
-      })
-  }
+//     const data = {
+//       queixa: queixaData.id,
+//       doencas: selected.map((doenca) => doenca.id),
+//       historico: form.historico,
+//     }
 
-  function handleQueixas(e) {
-    const newData = { ...form }
-    newData[e.target.id] = e.target.value
-    setForm(newData)
-  }
+//     Api.post('/prontuario', data).catch((err) => {
+//       console.error('ops! ocorreu um erro' + err)
+//     })
+//   }
 
-  function handleDoencas(e) {
-    const banana = { ...form }
-    banana[e.target.id] = e.target.value
-    setForm(banana)
-    setSelected([...selected, JSON.parse(banana.doencas)])
-    // console.log(newData)
-  }
+//   function handleQueixas(e) {
+//     const newData = { ...form }
+//     newData[e.target.id] = e.target.value
+//     setForm(newData)
+//   }
 
-  function handleHistorico(e) {
-    const newForm = { ...form }
-    newForm[e.target.id] = e.target.value
-    setForm(newForm)
-    console.log(newForm)
-  }
+//   function handleDoencas(e) {
+//     const banana = { ...form }
+//     banana[e.target.id] = e.target.value
+//     setForm(banana)
+//     setSelected([...selected, JSON.parse(banana.doencas)])
+//     // console.log(newData)
+//   }
 
-  if (!queixas) {
-    return <div>LOADING...</div>
-  }
+//   function handleHistorico(e) {
+//     const newForm = { ...form }
+//     newForm[e.target.id] = e.target.value
+//     setForm(newForm)
+//     console.log(newForm)
+//   }
 
-  return (
-    <div>
-      <form>
+//   if (!queixas) {
+//     return <div>LOADING...</div>
+//   }
 
-        <select
-          required
-          onChange={(e) => handleQueixas(e)}
-          id="queixa" 
-        >
-          <option>Selecione</option>
-          {queixas.map((opt) => (
-            <option value={JSON.stringify(opt)}>{opt.label}</option>
-          ))}
-        </select>
+//   return (
+//     <div>
+//       <form>
+//         <select required onChange={(e) => handleQueixas(e)} id="queixa">
+//           <option>Selecione</option>
+//           {queixas.map((opt) => (
+//             <option value={JSON.stringify(opt)}>{opt.label}</option>
+//           ))}
+//         </select>
 
-        <select
-          required
-          onChange={(e) => handleDoencas(e)}
-          id="doencas"
-          value={form.doencas}
-        >
-          <option required value>
-            Selecione
-          </option>
-          {doenca.map((opt) => (
-            <option id="doencas" value={JSON.stringify(opt)}>{opt.label}</option>
-          ))}
-        </select>
+//         <select
+//           required
+//           onChange={(e) => handleDoencas(e)}
+//           id="doencas"
+//           value={form.doencas}
+//         >
+//           <option required value>
+//             Selecione
+//           </option>
+//           {doenca.map((opt) => (
+//             <option id="doencas" value={JSON.stringify(opt)}>
+//               {opt.label}
+//             </option>
+//           ))}
+//         </select>
 
-        <textarea
-          type="text"
-          readOnly={true}
-          value={selected.map((item) => item.label).join(', ')}
-          placeholder="historico"
-        ></textarea>
+//         <textarea
+//           type="text"
+//           readOnly={true}
+//           value={selected.map((item) => item.label).join(', ')}
+//           placeholder="historico"
+//         ></textarea>
 
-        <div>
-          <p> Historico da molestia</p>
-          <textarea
-            id="historico"
-            minlength="10"
-            maxlength="1000"
-            onChange={handleHistorico}
-          ></textarea>
-        </div>
+//         <div>
+//           <p> Historico da molestia</p>
+//           <textarea
+//             id="historico"
+//             minlength="10"
+//             maxlength="1000"
+//             onChange={handleHistorico}
+//           ></textarea>
+//         </div>
 
-        <button onClick={(e) => submit(e)}>submit</button>
-      </form>
-    </div>
-  )
-}
+//         <button onClick={(e) => submit(e)}>submit</button>
+//       </form>
+//     </div>
+//   )
+// }
 
-export default PostForm
+// export default PostForm

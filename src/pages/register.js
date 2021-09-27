@@ -6,6 +6,9 @@ import H1 from '../Components/H1'
 import P from '../Components/P'
 import Textarea from '../Components/Textarea'
 import Selecionados from '../Components/Selecionados'
+import { Formik, Form, Field } from 'formik'
+import '../App.css'
+import * as Yup from "yup";
 
 function Register() {
   const [form, setForm] = useState({
@@ -14,6 +17,12 @@ function Register() {
     historico: '',
   })
 
+  const schema = Yup.object().shape({
+    historico: Yup.string()
+    .required()
+    .min(10, 'Must be exactly 5 digits')
+    .max(1000, 'Must be exactly 5 digits')
+  });
   const [selected, setSelected] = useState([])
   const [queixas, setQueixas] = useState([])
   const [doenca, setDoenca] = useState([])
@@ -76,59 +85,94 @@ function Register() {
   }
 
   return (
-    <div>
-      <H1 className="Anamnese" title="Anamnese" />
-      <form>
-        <P className="title" title="Queixa Principal" />
-        <select required onChange={(e) => handleQueixas(e)} id="queixa">
-          <option>Selecione</option>
-          {queixas.map((opt) => (
-            <option value={JSON.stringify(opt)}>{opt.label}</option>
-          ))}
-        </select>
+    <div className="container">
+      <div>
+        <img src="https://kompa.com.br/_next/image?url=%2Fimages%2Flogo.png&w=256&q=75" />
+      </div>
+      <div className="container2">
+        <Formik
+        validationSchema={schema}>
+          {({errors}) => (
+            <Form>
+              <form>
+                <H1 className="anamnese" title="Anamnese" />
+                <P className="title" title="Queixa Principal" />
+                <select
+                  className="dropDown"
+                  required="required"
+                  onChange={(e) => handleQueixas(e)}
+                  id="queixa"
+                >
+                  <option selected disabled value="">
+                    Selecione...
+                  </option>
+                  {queixas.map((opt) => (
+                    <option className="option" value={JSON.stringify(opt)}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
 
-        <P className="title" title="Doenças Adulto" />
-        <select
-          required
-          onChange={(e) => handleDoencas(e)}
-          id="doencas"
-          value={form.doencas}
-        >
-          <option required value>
-            Selecione
-          </option>
-          {doenca.map((opt) => (
-            <option id="doencas" value={JSON.stringify(opt)}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+                <P className="title" title="Doenças Adulto" />
+                <select
+                  className="dropDown"
+                  required="required"
+                  onChange={(e) => handleDoencas(e)}
+                  id="doencas"
+                  value={form.doencas}
+                >
+                  <option selected disabled value="">
+                    Selecione...
+                  </option>
+                  {doenca.map((opt) => (
+                    <option
+                      className="option"
+                      id="doencas"
+                      value={JSON.stringify(opt)}
+                    >
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
 
-        <P className="title1" title="Selecionados" />
-        <Selecionados value={selected.map((item) => item.label).join(', ')} />
-        <textarea
-          type="text"
-          readOnly={true}
-          value={selected.map((item) => item.label).join(', ')}
-          placeholder="historico"
-        ></textarea>
+                <P className="title1" title="Selecionados:" />
+                <Selecionados
+                  value={selected.map((item) => item.label).join(', ')}
+                />
+                <textarea
+                  className="historico"
+                  type="text"
+                  readOnly={true}
+                  value={selected.map((item) => item.label).join(', ')}
+                ></textarea>
 
-        <P title="Histórico da moléstia" />
+                <P title="Histórico da moléstia" />
+<div>
+  <label htmlFor="histprico"></label>
+                <Field
+                name="historico"
+                  className="historico"
+                  id="historico"
+                  type="text"
+                  required="required"
+                  minlength="10"
+                  maxlength="1000"
+                  onChange={handleHistorico}
+                />
+                {errors.historico && (
+                  <div>{errors.historico}campo requerido</div>
+                )}
+</div>
+                <Link to="/">
+                  <Button title="Salvar" handleClick={(e) => submit(e)} />
+                </Link>
 
-        <Textarea
-          id="historico"
-          type="text"
-          minLength={10}
-          maxLength="1000"
-          onChange={handleHistorico}
-        />
-
-        <Link to="/">
-          <Button title="Salvar" handleClick={(e) => submit(e)} />
-        </Link>
-
-        {/* <button onClick={(e) => submit(e)}>submit</button> */}
-      </form>
+                {/* <button onClick={(e) => submit(e)}>submit</button> */}
+              </form>
+            </Form>
+          )}
+        </Formik>
+      </div>
     </div>
   )
 }
